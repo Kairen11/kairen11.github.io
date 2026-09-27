@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kairen Analytics</title>
+<style>
+:root{
+  --bg:#08090d; --panel:#11131a; --panel2:#171a23; --text:#f5f7fb; --muted:#9298a8;
+  --accent:#ff334d; --accent2:#7c5cff; --green:#38d996; --border:#262a36;
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 80% -10%,#24203d 0,transparent 35%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input{font:inherit}.app{display:flex;min-height:100vh}.side{width:245px;border-right:1px solid var(--border);padding:24px 16px;position:sticky;top:0;height:100vh;background:#0b0c11}
+.logo{font-weight:900;font-size:23px;margin:0 10px 28px}.logo span{color:var(--accent)}
+.nav button{width:100%;background:transparent;color:#aeb4c2;border:0;text-align:left;padding:13px 14px;border-radius:12px;cursor:pointer;margin:3px 0}
+.nav button.active,.nav button:hover{background:#1a1c25;color:white}.bottom{position:absolute;bottom:20px;left:16px;right:16px;color:var(--muted);font-size:12px;padding:12px}
+main{flex:1;max-width:1300px;margin:auto;padding:30px;width:100%}.top{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:26px}
+h1{margin:0;font-size:30px}.sub{color:var(--muted);margin-top:5px}.connect{border:0;border-radius:12px;background:white;color:#111;padding:11px 16px;font-weight:800;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.card{background:linear-gradient(180deg,#151821,#101219);border:1px solid var(--border);border-radius:18px;padding:18px}.label{color:var(--muted);font-size:13px}.value{font-size:29px;font-weight:850;margin-top:7px}.green{color:var(--green)}.red{color:#ff6070}
+.layout{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-top:16px}.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:20px}.panel h2{font-size:18px;margin:0 0 5px}.panel p{color:var(--muted);font-size:13px;margin-top:4px}
+canvas{width:100%;height:280px;display:block}.table{width:100%;border-collapse:collapse;margin-top:10px}.table th,.table td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--border);font-size:13px}.table th{color:var(--muted);font-weight:600}
+.form{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form .full{grid-column:1/-1}label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}input{width:100%;background:#0c0e13;color:white;border:1px solid var(--border);border-radius:10px;padding:11px;outline:none}input:focus{border-color:#6658ff}
+.primary{border:0;background:linear-gradient(90deg,var(--accent),#ff6a3d);color:#fff;padding:11px 16px;border-radius:11px;font-weight:800;cursor:pointer}.secondary{border:1px solid var(--border);background:#181b24;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:14px}
+.page{display:none}.page.active{display:block}.hint{font-size:12px;color:var(--muted);line-height:1.5}.pill{display:inline-block;padding:5px 8px;border-radius:99px;background:#20232d;font-size:11px;color:#c8ccda}
+@media(max-width:900px){.side{display:none}.grid{grid-template-columns:1fr 1fr}.layout{grid-template-columns:1fr}main{padding:20px}.top{align-items:flex-start}.top .connect{display:none}}
+@media(max-width:560px){.grid{grid-template-columns:1fr}.form{grid-template-columns:1fr}.form .full{grid-column:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="logo">KAIREN<span>•</span>ANALYTICS</div>
+  <div class="nav">
+    <button class="active" data-page="home">📊 Tableau de bord</button>
+    <button data-page="weeks">📈 Mes semaines</button>
+    <button data-page="add">➕ Ajouter une semaine</button>
+    <button data-page="videos">🎬 Vidéos</button>
+    <button data-page="settings">⚙️ Chaîne</button>
+  </div>
+  <div class="bottom">Version prototype • Données sauvegardées sur cet appareil</div>
+</aside>
+
+<main>
+<section id="home" class="page active">
+  <div class="top"><div><h1>Ton évolution YouTube</h1><div class="sub">Suis ta progression semaine après semaine.</div></div><button class="connect" onclick="go('settings')">🔗 Connecter YouTube</button></div>
+  <div class="grid">
+    <div class="card"><div class="label">Abonnés actuels</div><div class="value" id="current">0</div></div>
+    <div class="card"><div class="label">Évolution cette semaine</div><div class="value" id="delta">—</div></div>
+    <div class="card"><div class="label">Meilleure semaine</div><div class="value" id="best">—</div></div>
+    <div class="card"><div class="label">Semaines enregistrées</div><div class="value" id="count">0</div></div>
+  </div>
+  <div class="layout">
+    <div class="panel"><h2>📈 Courbe des abonnés</h2><p>Comme une petite bourse, mais pour ta chaîne.</p><canvas id="chart"></canvas></div>
+    <div class="panel"><h2>🔥 Tes meilleures semaines</h2><p>Classement selon le gain d'abonnés.</p><div id="ranking"></div></div>
+  </div>
+  <div class="panel" style="margin-top:16px"><h2>🧠 Lecture rapide</h2><p id="insight">Ajoute quelques semaines pour obtenir des analyses.</p></div>
+</section>
+
+<section id="weeks" class="page">
+  <div class="top"><div><h1>Mes semaines</h1><div class="sub">Toutes tes données semaine par semaine.</div></div><button class="primary" onclick="go('add')">+ Ajouter</button></div>
+  <div class="panel"><div id="weekTable"></div></div>
+</section>
+
+<section id="add" class="page">
+  <div class="top"><div><h1>Ajouter une semaine</h1><div class="sub">Entre ton nombre d'abonnés à la fin de la semaine.</div></div></div>
+  <div class="panel">
+    <div class="form">
+      <div><label>Semaine</label><input id="weekDate" type="date"></div>
+      <div><label>Abonnés à la fin de la semaine</label><input id="subs" type="number" min="0" placeholder="ex. 127"></div>
+      <div><label>Vidéos publiées</label><input id="videosCount" type="number" min="0" value="0"></div>
+      <div><label>Vues totales de la semaine</label><input id="views" type="number" min="0" value="0"></div>
+      <div class="full"><label>Note personnelle</label><input id="note" placeholder="ex. Short FNCS = beaucoup de vues"></div>
+      <div class="full"><button class="primary" onclick="addWeek()">Enregistrer la semaine</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="videos" class="page">
+  <div class="top"><div><h1>Vidéos</h1><div class="sub">Prépare l'analyse de tes performances vidéo.</div></div></div>
+  <div class="panel">
+    <h2>Connexion YouTube</h2>
+    <p>Le prototype peut déjà suivre tes semaines. Pour récupérer automatiquement les vidéos, vues, likes et autres statistiques, il faudra connecter l'API YouTube Data/Analytics avec une autorisation Google.</p>
+    <div class="empty">🎬 Aucune vidéo synchronisée pour le moment.<br><br><button class="secondary" onclick="go('settings')">Configurer ma chaîne</button></div>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <div class="top"><div><h1>Ma chaîne</h1><div class="sub">Configuration de Kairen Analytics.</div></div></div>
+  <div class="panel">
+    <div class="form">
+      <div class="full"><label>URL de ta chaîne YouTube</label><input id="channelUrl" placeholder="https://youtube.com/@kairen_twitch"></div>
+      <div class="full"><button class="primary" onclick="saveSettings()">Enregistrer</button></div>
+    </div>
+    <p class="hint" style="margin-top:18px">🔒 Cette version ne demande pas ton mot de passe Google. Une vraie connexion YouTube doit passer par OAuth Google et l'API officielle YouTube. Ne mets jamais ton mot de passe dans ce site.</p>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <h2>💾 Tes données</h2><p>Elles sont conservées dans le stockage local de ton navigateur.</p>
+    <button class="secondary" onclick="exportData()">Exporter mes données</button>
+    <button class="secondary" onclick="resetData()">Réinitialiser</button>
+  </div>
+</section>
+</main>
+</div>
+
+<script>
+const KEY='kairenAnalyticsV1';
+let data=JSON.parse(localStorage.getItem(KEY)||'{"weeks":[],"channel":""}');
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(data));}
+function go(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(page).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===page));render();}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.page));
+function addWeek(){
+  const date=$('weekDate').value, subs=Number($('subs').value);
+  if(!date || !Number.isFinite(subs) || subs<0){alert('Remplis la date et le nombre d’abonnés.');return}
+  data.weeks.push({date,subs,videos:Number($('videosCount').value)||0,views:Number($('views').value)||0,note:$('note').value});
+  data.weeks.sort((a,b)=>a.date.localeCompare(b.date)); save();
+  $('subs').value='';$('note').value='';go('home');
+}
+function fmt(n){return Number(n).toLocaleString('fr-FR')}
+function delta(i){if(i<=0)return null;return data.weeks[i].subs-data.weeks[i-1].subs}
+function render(){
+  if(data.channel)$('channelUrl').value=data.channel;
+  const w=data.weeks;
+  $('current').textContent=w.length?fmt(w[w.length-1].subs):'0';
+  const d=w.length>1?delta(w.length-1):null;
+  $('delta').textContent=d===null?'—':(d>=0?'+':'')+fmt(d);
+  $('delta').className='value '+(d>0?'green':d<0?'red':'');
+  $('count').textContent=fmt(w.length);
+  let best=null; w.forEach((x,i)=>{const d=delta(i);if(d!==null && (!best||d>best.d))best={d,date:x.date}});
+  $('best').textContent=best?(best.d>=0?'+':'')+fmt(best.d):'—';
+  draw();
+  const ranked=w.map((x,i)=>({x,d:delta(i)})).filter(a=>a.d!==null).sort((a,b)=>b.d-a.d).slice(0,5);
+  $('ranking').innerHTML=ranked.length?ranked.map((a,i)=>`<div style="display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)"><span>#${i+1} • ${new Date(a.x.date+'T12:00').toLocaleDateString('fr-FR')}</span><b class="${a.d>=0?'green':'red'}">${a.d>=0?'+':''}${fmt(a.d)}</b></div>`).join(''):'<div class="empty">Ajoute au moins 2 semaines.</div>';
+  $('insight').textContent=w.length<2?'Ajoute au moins 2 semaines pour comparer ta progression.':d>0?`Cette semaine, tu es à +${fmt(d)} abonnés. Continue à noter ce que tu as publié pour repérer les formats qui fonctionnent.`:d<0?`Cette semaine, tu es à ${fmt(d)} abonnés. Regarde surtout les vidéos publiées cette semaine et leurs vues/retention.`:'Cette semaine, ton nombre d’abonnés est stable.';
+  $('weekTable').innerHTML=w.length?`<table class="table"><tr><th>Semaine</th><th>Abonnés</th><th>Évolution</th><th>Vidéos</th><th>Vues</th><th>Note</th></tr>${w.slice().reverse().map((x,ri)=>{const i=w.length-1-ri,d=delta(i);return `<tr><td>${new Date(x.date+'T12:00').toLocaleDateString('fr-FR')}</td><td><b>${fmt(x.subs)}</b></td><td class="${d>0?'green':d<0?'red':''}">${d===null?'—':(d>=0?'+':'')+fmt(d)}</td><td>${fmt(x.videos)}</td><td>${fmt(x.views)}</td><td>${x.note||'—'}</td></tr>`}).join('')}</table>`:'<div class="empty">Aucune semaine enregistrée.</div>';
+}
+function draw(){
+ const c=$('chart'),ctx=c.getContext('2d'),r=c.getBoundingClientRect(),dpr=devicePixelRatio||1;c.width=r.width*dpr;c.height=280*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,r.width,280);
+ const w=data.weeks;if(!w.length){ctx.fillStyle='#777d8c';ctx.textAlign='center';ctx.font='14px system-ui';ctx.fillText('Ajoute ta première semaine pour voir la courbe.',r.width/2,140);return}
+ const pad=35,W=r.width-pad*2,H=220;let min=Math.min(...w.map(x=>x.subs)),max=Math.max(...w.map(x=>x.subs));if(min===max){min-=5;max+=5}
+ ctx.strokeStyle='#282c38';ctx.lineWidth=1;for(let i=0;i<5;i++){let y=20+i*H/4;ctx.beginPath();ctx.moveTo(pad,y);ctx.lineTo(r.width-pad,y);ctx.stroke()}
+ ctx.strokeStyle='#7c5cff';ctx.lineWidth=3;ctx.beginPath();
+ w.forEach((x,i)=>{let xx=pad+(w.length===1?W/2:W*i/(w.length-1)),yy=20+H-(x.subs-min)/(max-min)*H;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)});ctx.stroke();
+ w.forEach((x,i)=>{let xx=pad+(w.length===1?W/2:W*i/(w.length-1)),yy=20+H-(x.subs-min)/(max-min)*H;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(xx,yy,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#9298a8';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText(new Date(x.date+'T12:00').toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}),xx,260)})
+}
+function saveSettings(){data.channel=$('channelUrl').value.trim();save();alert('Chaîne enregistrée !');}
+function exportData(){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='kairen-analytics.json';a.click();}
+function resetData(){if(confirm('Supprimer toutes les données locales ?')){data={weeks:[],channel:data.channel};save();render();}}
+window.addEventListener('resize',draw);render();
+</script>
+</body>
+</html>
