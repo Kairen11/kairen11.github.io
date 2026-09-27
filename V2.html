@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090d">
+<title>Kairen Analytics V2</title>
+<style>
+:root{--bg:#08090d;--panel:#11131a;--panel2:#171a23;--line:#262a36;--text:#f7f8fb;--muted:#8e96a8;--violet:#7c5cff;--pink:#ff3d68;--green:#39d99a;--red:#ff6878}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(800px 450px at 85% -10%,#2c2052 0,transparent 62%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input{font:inherit}button{cursor:pointer}
+.side{position:fixed;left:0;top:0;bottom:0;width:245px;background:#090a0f;border-right:1px solid var(--line);padding:22px 14px;z-index:10}.brand{font-weight:900;font-size:21px;padding:0 10px 26px}.brand b{color:var(--pink)}.nav button{display:block;width:100%;border:0;background:transparent;color:#aeb5c5;text-align:left;padding:12px;border-radius:11px;margin:3px 0}.nav button.active,.nav button:hover{background:#191b25;color:#fff}.foot{position:absolute;bottom:18px;left:24px;right:20px;color:#61697b;font-size:11px}
+main{margin-left:245px;padding:30px;max-width:1450px}.page{display:none}.page.active{display:block}.top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:20px}h1{margin:0;font-size:30px}.sub{color:var(--muted);font-size:14px;margin-top:5px}
+.btn{border:1px solid var(--line);background:#181b24;color:#fff;border-radius:11px;padding:10px 14px;font-weight:750}.btn.primary{border:0;background:linear-gradient(90deg,var(--violet),#a149ff)}.btn.danger{color:#ff8290}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.card,.panel{background:linear-gradient(180deg,#151821,#101219);border:1px solid var(--line);border-radius:17px}.card{padding:16px}.label{font-size:12px;color:var(--muted)}.big{font-size:27px;font-weight:900;margin-top:8px}.up{color:var(--green)}.down{color:var(--red)}
+.layout{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-top:14px}.panel{padding:18px}.panel h2{margin:0;font-size:17px}.hint{color:var(--muted);font-size:12px;margin:5px 0 15px}.chart{height:290px}.chart canvas{width:100%;height:100%}.rank{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px}.rank:last-child{border-bottom:0}
+.form{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.full{grid-column:1/-1}label{display:block;color:var(--muted);font-size:12px;margin-bottom:6px}input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#0a0c11;color:#fff;outline:none}input:focus{border-color:var(--violet)}
+.tablewrap{overflow:auto}.table{border-collapse:collapse;width:100%;min-width:850px}.table th,.table td{text-align:left;padding:11px 8px;border-bottom:1px solid var(--line);font-size:13px}.table th{color:var(--muted);font-weight:600}.empty{text-align:center;padding:30px;color:var(--muted);border:1px dashed var(--line);border-radius:13px}.notice{background:#151421;border:1px solid #342a62;padding:13px;border-radius:13px;color:#bdc2d0;font-size:12px;line-height:1.55}.search{margin-bottom:12px}.mobile{display:none}
+@media(max-width:900px){.side{display:none}main{margin:0;padding:20px 15px 90px}.cards{grid-template-columns:repeat(2,1fr)}.cards .card:last-child{grid-column:1/-1}.layout{grid-template-columns:1fr}.mobile{display:flex;position:fixed;bottom:0;left:0;right:0;background:#0d0f15;border-top:1px solid var(--line);z-index:20;justify-content:space-around;padding:7px}.mobile button{border:0;background:transparent;color:#8f96a7;font-size:10px}.mobile button.active{color:#fff}.mobile span{display:block;font-size:17px}.top{align-items:flex-start}h1{font-size:24px}}
+@media(max-width:520px){.form{grid-template-columns:1fr}.full{grid-column:auto}.big{font-size:22px}}
+</style>
+</head>
+<body>
+<aside class="side">
+<div class="brand">KAIREN<b>•</b>ANALYTICS</div>
+<div class="nav">
+<button class="active" data-page="home">📊 Tableau de bord</button>
+<button data-page="weeks">📈 Mes semaines</button>
+<button data-page="addweek">➕ Ajouter une semaine</button>
+<button data-page="videos">🎬 Mes vidéos</button>
+<button data-page="addvideo">➕ Ajouter une vidéo</button>
+<button data-page="settings">⚙️ Ma chaîne</button>
+</div>
+<div class="foot">V2 • Données enregistrées dans ce navigateur.</div>
+</aside>
+
+<main>
+<section class="page active" id="home">
+<div class="top"><div><h1>Salut Kairen 👋</h1><div class="sub">Ton mini YouTube Studio personnel.</div></div><button class="btn primary" onclick="go('addvideo')">+ Ajouter une vidéo</button></div>
+<div class="cards">
+<div class="card"><div class="label">Abonnés actuels</div><div class="big" id="currentSubs">0</div></div>
+<div class="card"><div class="label">Cette semaine</div><div class="big" id="weeklySubs">—</div></div>
+<div class="card"><div class="label">Vues enregistrées</div><div class="big" id="totalViews">0</div></div>
+<div class="card"><div class="label">Vidéos suivies</div><div class="big" id="videoCount">0</div></div>
+<div class="card"><div class="label">Meilleure vidéo</div><div class="big" id="bestVideo" style="font-size:17px">—</div></div>
+</div>
+<div class="layout">
+<div class="panel"><h2>📈 Évolution des abonnés</h2><div class="hint">Chaque point = ton compteur en fin de semaine.</div><div class="chart"><canvas id="chart"></canvas></div></div>
+<div class="panel"><h2>🏆 Meilleures vidéos</h2><div class="hint">Classement par vues.</div><div id="videoRanking"></div></div>
+</div>
+<div class="panel" style="margin-top:14px"><h2>🧠 Analyse rapide</h2><div class="hint" id="analysis">Ajoute tes premières données pour commencer.</div></div>
+</section>
+
+<section class="page" id="weeks">
+<div class="top"><div><h1>Mes semaines</h1><div class="sub">Ton évolution semaine après semaine.</div></div><button class="btn primary" onclick="go('addweek')">+ Ajouter</button></div>
+<div class="panel"><div class="tablewrap" id="weekTable"></div></div>
+</section>
+
+<section class="page" id="addweek">
+<div class="top"><div><h1>Ajouter une semaine</h1><div class="sub">Note ton compteur à la fin de chaque semaine.</div></div></div>
+<div class="panel"><div class="form">
+<div><label>Date de fin</label><input id="wDate" type="date"></div>
+<div><label>Nombre d'abonnés</label><input id="wSubs" type="number" min="0" placeholder="ex. 127"></div>
+<div><label>Vidéos publiées cette semaine</label><input id="wVideos" type="number" min="0" value="0"></div>
+<div><label>Vues totales de la semaine</label><input id="wViews" type="number" min="0" value="0"></div>
+<div class="full"><label>Note</label><input id="wNote" placeholder="ex. Le Short FNCS a très bien marché"></div>
+<div class="full"><button class="btn primary" onclick="saveWeek()">Enregistrer la semaine</button></div>
+</div></div>
+</section>
+
+<section class="page" id="videos">
+<div class="top"><div><h1>Mes vidéos 🎬</h1><div class="sub">Ajoute les statistiques de chaque vidéo ou Short.</div></div><button class="btn primary" onclick="go('addvideo')">+ Ajouter une vidéo</button></div>
+<div class="panel">
+<input class="search" id="videoSearch" oninput="renderVideos()" placeholder="🔎 Rechercher une vidéo ou un hashtag...">
+<div class="tablewrap" id="videoTable"></div>
+</div>
+</section>
+
+<section class="page" id="addvideo">
+<div class="top"><div><h1>Ajouter une vidéo 🎬</h1><div class="sub">Entre les chiffres visibles dans YouTube Studio.</div></div></div>
+<div class="panel"><div class="form">
+<div class="full"><label>Titre de la vidéo / Short</label><input id="vTitle" placeholder="ex. TOP 5 des pioches Fortnite"></div>
+<div class="full"><label>Lien YouTube (facultatif)</label><input id="vUrl" placeholder="https://youtube.com/shorts/..."></div>
+<div><label>Date de publication</label><input id="vDate" type="date"></div>
+<div><label>Type</label><input id="vType" placeholder="Short ou Vidéo"></div>
+<div><label>👀 Vues</label><input id="vViews" type="number" min="0" value="0"></div>
+<div><label>👍 Likes</label><input id="vLikes" type="number" min="0" value="0"></div>
+<div><label>💬 Commentaires</label><input id="vComments" type="number" min="0" value="0"></div>
+<div><label>👥 Abonnés gagnés</label><input id="vSubs" type="number" value="0"></div>
+<div class="full"><label>#️⃣ Hashtags (séparés par des espaces)</label><input id="vTags" placeholder="#Fortnite #FNCS #gaming"></div>
+<div class="full"><label>📝 Note personnelle</label><input id="vNote" placeholder="ex. Hook très fort, bon taux de rétention"></div>
+<div class="full"><button class="btn primary" onclick="saveVideo()">Enregistrer la vidéo</button></div>
+</div></div>
+</section>
+
+<section class="page" id="settings">
+<div class="top"><div><h1>Ma chaîne ⚙️</h1><div class="sub">Configuration.</div></div></div>
+<div class="panel"><div class="form">
+<div class="full"><label>URL de ta chaîne YouTube</label><input id="channel" placeholder="https://youtube.com/@kairen_twitch"></div>
+<div class="full"><button class="btn primary" onclick="saveChannel()">Enregistrer</button></div>
+</div></div>
+<div class="panel" style="margin-top:14px"><h2>💾 Données</h2><div class="hint">Tes données restent dans le navigateur de cet appareil.</div><button class="btn" onclick="exportData()">Exporter</button> <button class="btn danger" onclick="resetAll()">Tout effacer</button></div>
+</section>
+</main>
+
+<div class="mobile">
+<button data-page="home" class="active">📊<span>Accueil</span></button>
+<button data-page="weeks">📈<span>Semaines</span></button>
+<button data-page="addweek">➕<span>Semaine</span></button>
+<button data-page="videos">🎬<span>Vidéos</span></button>
+<button data-page="settings">⚙️<span>Réglages</span></button>
+</div>
+
+<script>
+const KEY='kairenAnalyticsV3';
+let data=JSON.parse(localStorage.getItem(KEY)||'{"weeks":[],"videos":[],"channel":""}');
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function go(page){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$(page).classList.add('active');document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));render()}
+document.querySelectorAll('[data-page]').forEach(x=>x.onclick=()=>go(x.dataset.page));
+function fmt(n){return Number(n||0).toLocaleString('fr-FR')}
+function delta(i){return i>0?data.weeks[i].subs-data.weeks[i-1].subs:null}
+function saveWeek(){
+ const date=$('wDate').value,subs=Number($('wSubs').value);
+ if(!date||subs<0||!Number.isFinite(subs)){alert("Indique la date et le nombre d'abonnés.");return}
+ data.weeks.push({date,subs,videos:Number($('wVideos').value)||0,views:Number($('wViews').value)||0,note:$('wNote').value.trim()});
+ data.weeks.sort((a,b)=>a.date.localeCompare(b.date));save();
+ $('wSubs').value='';$('wVideos').value=0;$('wViews').value=0;$('wNote').value='';go('home')
+}
+function saveVideo(){
+ const title=$('vTitle').value.trim(),date=$('vDate').value;
+ if(!title||!date){alert('Indique au minimum le titre et la date.');return}
+ data.videos.push({title,url:$('vUrl').value.trim(),date,type:$('vType').value.trim()||'Short',views:Number($('vViews').value)||0,likes:Number($('vLikes').value)||0,comments:Number($('vComments').value)||0,subs:Number($('vSubs').value)||0,tags:$('vTags').value.trim(),note:$('vNote').value.trim()});
+ data.videos.sort((a,b)=>b.date.localeCompare(a.date));save();
+ ['vTitle','vUrl','vDate','vType','vViews','vLikes','vComments','vSubs','vTags','vNote'].forEach(id=>$(id).value='');$('vViews').value=$('vLikes').value=$('vComments').value=$('vSubs').value=0;go('videos')
+}
+function render(){
+ const w=data.weeks,v=data.videos;
+ $('currentSubs').textContent=w.length?fmt(w[w.length-1].subs):'0';
+ const d=w.length>1?delta(w.length-1):null;$('weeklySubs').textContent=d===null?'—':(d>=0?'+':'')+fmt(d);$('weeklySubs').className='big '+(d>0?'up':d<0?'down':'');
+ $('totalViews').textContent=fmt(v.reduce((s,x)=>s+x.views,0));$('videoCount').textContent=fmt(v.length);
+ const best=v.slice().sort((a,b)=>b.views-a.views)[0];$('bestVideo').textContent=best?`${fmt(best.views)} vues`:'—';
+ const top=v.slice().sort((a,b)=>b.views-a.views).slice(0,5);$('videoRanking').innerHTML=top.length?top.map((x,i)=>`<div class="rank"><span>#${i+1} • ${esc(x.title)}</span><b>${fmt(x.views)}</b></div>`).join(''):'<div class="empty">Ajoute tes premières vidéos.</div>';
+ $('analysis').textContent=v.length?`Tu suis ${v.length} vidéo${v.length>1?'s':''}. Ta meilleure a ${fmt(best.views)} vues et ${fmt(best.subs)} abonné${best.subs>1?'s':''} gagné${best.subs>1?'s':''}.`:w.length>1?`Cette semaine, ton compteur a ${d>=0?'augmenté de '+fmt(d):'baissé de '+fmt(Math.abs(d))} abonné${Math.abs(d)>1?'s':''}.`:'Ajoute tes premières données pour commencer.';
+ renderWeeks();renderVideos();drawChart();
+ if(data.channel)$('channel').value=data.channel
+}
+function renderWeeks(){
+ const w=data.weeks;
+ $('weekTable').innerHTML=w.length?`<table class="table"><tr><th>Date</th><th>Abonnés</th><th>Évolution</th><th>Vidéos</th><th>Vues</th><th>Note</th></tr>${w.slice().reverse().map((x,r)=>{let i=w.length-1-r,d=delta(i);return `<tr><td>${dateFr(x.date)}</td><td><b>${fmt(x.subs)}</b></td><td class="${d>0?'up':d<0?'down':''}">${d===null?'—':(d>=0?'+':'')+fmt(d)}</td><td>${fmt(x.videos)}</td><td>${fmt(x.views)}</td><td>${esc(x.note||'—')}</td></tr>`}).join('')}</table>`:'<div class="empty">Aucune semaine enregistrée.</div>'
+}
+function renderVideos(){
+ const q=($('videoSearch')?.value||'').toLowerCase();let v=data.videos.filter(x=>(x.title+' '+x.tags+' '+x.type).toLowerCase().includes(q));
+ $('videoTable').innerHTML=v.length?`<table class="table"><tr><th>Date</th><th>Titre</th><th>Type</th><th>Vues</th><th>Likes</th><th>Com.</th><th>Abonnés</th><th>Hashtags</th></tr>${v.map(x=>`<tr><td>${dateFr(x.date)}</td><td>${x.url?`<a href="${safeUrl(x.url)}" target="_blank" style="color:#b9aaff">${esc(x.title)}</a>`:esc(x.title)}</td><td>${esc(x.type)}</td><td><b>${fmt(x.views)}</b></td><td>${fmt(x.likes)}</td><td>${fmt(x.comments)}</td><td class="${x.subs>0?'up':x.subs<0?'down':''}">${x.subs>=0?'+':''}${fmt(x.subs)}</td><td>${esc(x.tags||'—')}</td></tr>`).join('')}</table>`:'<div class="empty">Aucune vidéo trouvée.</div>'
+}
+function dateFr(s){return new Date(s+'T12:00').toLocaleDateString('fr-FR')}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeUrl(s){try{let u=new URL(s);return ['https:','http:'].includes(u.protocol)?u.href:'#'}catch{return '#'}}
+function drawChart(){
+ const c=$('chart'),ctx=c.getContext('2d'),r=c.getBoundingClientRect(),dpr=devicePixelRatio||1,w=r.width,h=290;c.width=w*dpr;c.height=h*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+ const a=data.weeks;if(!a.length){ctx.fillStyle='#777e90';ctx.textAlign='center';ctx.font='14px system-ui';ctx.fillText('Ajoute des semaines pour voir ta courbe.',w/2,h/2);return}
+ let min=Math.min(...a.map(x=>x.subs)),max=Math.max(...a.map(x=>x.subs));if(min===max){min-=5;max+=5}
+ const p=35,W=w-70,H=220;ctx.strokeStyle='#262a36';for(let i=0;i<5;i++){let y=20+i*H/4;ctx.beginPath();ctx.moveTo(p,y);ctx.lineTo(w-p,y);ctx.stroke()}
+ ctx.strokeStyle='#7c5cff';ctx.lineWidth=3;ctx.beginPath();a.forEach((x,i)=>{let X=p+(a.length===1?W/2:W*i/(a.length-1)),Y=20+H-(x.subs-min)/(max-min)*H;i?ctx.lineTo(X,Y):ctx.moveTo(X,Y)});ctx.stroke();
+ a.forEach((x,i)=>{let X=p+(a.length===1?W/2:W*i/(a.length-1)),Y=20+H-(x.subs-min)/(max-min)*H;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(X,Y,4.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#8b92a3';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText(dateFr(x.date).slice(0,5),X,270)})
+}
+function saveChannel(){data.channel=$('channel').value.trim();save();alert('Chaîne enregistrée !')}
+function exportData(){let b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kairen-analytics.json';a.click()}
+function resetAll(){if(confirm('Effacer toutes tes semaines et vidéos de cet appareil ?')){data={weeks:[],videos:[],channel:''};save();render()}}
+window.addEventListener('resize',drawChart);render();
+</script>
+</body>
+</html>
